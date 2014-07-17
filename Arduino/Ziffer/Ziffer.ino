@@ -30,7 +30,7 @@ void takeSample()
   byte outbyte = 0;
   byte currentByte = 0;
  
-  //For loop for building a byte from bits 
+  //Loop for building a byte from bits 
   for(int j=0; j < 8; j++){ 
     //Pins are read using registers because its much faster than digitalRead()
     pinInput1 = (PINB >> 3) & B00000001;
@@ -45,6 +45,8 @@ void takeSample()
 
   //Mix the current byte with the previous one
   outbyte = currentByte ^ previousByte;
+  
+  //Send it to your computer
   Serial.write(outbyte);  
   
   previousByte = currentByte;
