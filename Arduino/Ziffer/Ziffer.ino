@@ -1,4 +1,11 @@
-
+/*****************************
+ * Z1FFER
+ * OpenRandom.org
+ *
+ * Created by Rob Seward 2013-2014
+ * 2013-2014 VHS Design LLC
+/******************************/
+ 
 byte previousByte = 0;
 
 void setup()
