@@ -25,8 +25,6 @@ void loop()
 void takeSample()
 {
   byte pinInput1 = 0;
-  byte pinInput2 = 0;
-  byte combinedInput = 0;
   byte outbyte = 0;
   byte currentByte = 0;
  
@@ -34,13 +32,9 @@ void takeSample()
   for(int j=0; j < 8; j++){ 
     //Pins are read using registers because its much faster than digitalRead()
     pinInput1 = (PINB >> 3) & B00000001;
-    pinInput2 = (PINB >> 4) & B00000001;
-
-    //Mix the two Z1FFER bits
-    combinedInput = pinInput1 ^ pinInput2;
     
-    //Add the bit in combinedInput to currentByte
-    currentByte = (combinedInput << j) | currentByte;
+    //Add the bit to currentByte
+    currentByte = (pinInput1 << j) | currentByte;
   }  
 
   //Mix the current byte with the previous one
