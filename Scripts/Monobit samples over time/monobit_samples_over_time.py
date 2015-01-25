@@ -3,13 +3,14 @@ import time
 import sys
 import curses
 import atexit
+import datetime
 
-use_curses = 1
+use_curses = 0
 
 ser = serial.Serial('/dev/tty.usbmodem1411', 230400)
 #ser = serial.Serial('/dev/tty.usbmodemfd121', 230400)
 
-SAMPLE_SIZE = 330000
+SAMPLE_SIZE = 10000000
 
 
 def exit_handler():
@@ -19,37 +20,47 @@ def exit_handler():
     print 'Deviation Sample Test Exiting'
 
 def get_data_from_rng():
-    screen.addstr(0, 0, "Burning initial bits...")
-    screen.refresh()
+    if use_curses:
+        screen.addstr(0, 0, "Burning initial bits...")
+        screen.refresh()
 
     #burn some bytes (I think there may be some kind of serial buffer weirdness going on
     bytes_to_burn = 1000
     bytes_burnt = 0
-    while bytes_burnt < bytes_to_burn:
-        ser.read(1)
-        bytes_burnt += 1
+    while bytes_burnt <= bytes_to_burn:
+        read_count = 500
+        ser.read(read_count)
+        bytes_burnt += read_count
 
+    if use_curses: screen.addstr(0, 0, "Initial bits burnt...")
+   
     start_time = time.time()
-    f = open("deviations.csv", 'w')
+
+    filename = "deviations.csv"
+    f = open(filename, 'w')
+    time_string = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    f.write(time_string + "\n")
+    f.close
+
+    if not use_curses: print(time_string + "\n")
     while True:
-        bytes_list = []
         ones = 0
         zeros = 0
-        while len(bytes_list) < SAMPLE_SIZE:
-            if len(bytes_list) % 100 == 0:
-                report_progress(ones, zeros, bytes_list, start_time)
-            byte_string = ser.read(1)
+        while (ones+zeros) < SAMPLE_SIZE:
+            if use_curses:
+                report_progress(ones, zeros, start_time)
+            byte_string = ser.read(500)
             byte_array = bytearray(byte_string)
 
-            #byte_array should always have a length of 1
             for b in byte_array:
                 one_count = bin(b).count("1")
                 ones += one_count
                 zeros += 8 - one_count
-            bytes_list.append(byte_string)
         deviation = float(ones - zeros) / float(ones + zeros)
         elapsed_time = time.time() - start_time
-        f.write("{0:1.2f}, {1:1.5f}\n".format(elapsed_time, deviation)) 
+        f = open(filename, 'a')
+        f.write ("{0:1.2f}, {1:1.5f}\n".format(elapsed_time, deviation)) 
+        f.close()
 
     f.close()
     if not use_curses:
@@ -58,12 +69,12 @@ def get_data_from_rng():
         print "\n-- monobit test --\n0s: {}\n1s: {}\ndifference: {}\ntotal: {}\nDeviation: {}".format(zeros, ones, zeros - ones, zeros + ones, deviation)
 
 
-def report_progress(ones, zeros, bytes_list, start_time):
+def report_progress(ones, zeros, start_time):
     if(ones + zeros <= 0):
         return
     deviation = float(ones - zeros) / float(ones + zeros)
     elapsed_time = time.time() - start_time
-    kbs = (((zeros + ones) / 8.0) / elapsed_time) / 1000.0
+    kbs = (( (zeros + ones) / 8.0) / elapsed_time) / 1000.0
 
     total_bytes = (zeros+ones) / 8
     if use_curses:
@@ -72,11 +83,11 @@ def report_progress(ones, zeros, bytes_list, start_time):
         screen.addstr(2, 0, "Difference: {0}    ".format(ones - zeros))
         screen.addstr(3, 0, "Deviation: {0:2.10f}    ".format(deviation))
         screen.addstr(4, 0, "Elapsed Time: {0:2.2f}".format(time.time() - start_time))
-        screen.addstr(5, 0, "Percent Complete: {0:2.2f}".format((float(total_bytes) / float(SAMPLE_SIZE)) * 100))
+        screen.addstr(5, 0, "Percent Complete: {0:2.2f}".format((float(ones + zeros) / float(SAMPLE_SIZE)) * 100))
         screen.addstr(6, 0, "kb/s: {0:2.2f}".format(kbs))
         screen.refresh()
     else:
-        progress = (len(bytes_list) / float(SAMPLE_SIZE)) * 100.0
+        progress = ((ones + zeros) / float(SAMPLE_SIZE)) * 100.0
         progress_str = "{0:2.2f}%\r".format(progress)
         sys.stdout.write(progress_str)
 
