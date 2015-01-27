@@ -38,11 +38,8 @@ def get_data_from_rng():
 
     filename = "deviations.csv"
     f = open(filename, 'w')
-    time_string = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-    f.write(time_string + "\n")
-    f.close
 
-    if not use_curses: print(time_string + "\n")
+    if not use_curses: print("starting...")
     while True:
         ones = 0
         zeros = 0
@@ -57,9 +54,10 @@ def get_data_from_rng():
                 ones += one_count
                 zeros += 8 - one_count
         deviation = float(ones - zeros) / float(ones + zeros)
-        elapsed_time = time.time() - start_time
+    
+        time_string = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         f = open(filename, 'a')
-        f.write ("{0:1.2f}, {1:1.5f}\n".format(elapsed_time, deviation)) 
+        f.write ("{0}, {1:1.5f}\n".format(time_string, deviation)) 
         f.close()
 
     f.close()
