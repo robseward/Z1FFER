@@ -9,11 +9,11 @@ use_curses = 1
 ser = serial.Serial('/dev/tty.usbmodem1411', 230400)
 #ser = serial.Serial('/dev/tty.usbmodemfd121', 230400)
 
-SAMPLE_SIZE = 104857600
+# SAMPLE_SIZE = 104857600
 # SAMPLE_SIZE = 314572800
 # SAMPLE_SIZE = 125000000
 # SAMPLE_SIZE = 39321600
-#SAMPLE_SIZE = 5000000
+SAMPLE_SIZE = 10000000
 
 
 
