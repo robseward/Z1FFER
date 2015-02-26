@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6A755ADE-7909-44CB-B7E0-644A3DFA4CCD</string>
+	<key>IDESourceControlProjectName</key>
+	<string>WhiteningStressTest</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>387290974BC2B49F5AF7E6037399F0D770BAF4AD</key>
+		<string>https://github.com/robseward/Ziffer.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Scripts/WhiteningStressTest/WhiteningStressTest.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>387290974BC2B49F5AF7E6037399F0D770BAF4AD</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/robseward/Ziffer.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>387290974BC2B49F5AF7E6037399F0D770BAF4AD</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>387290974BC2B49F5AF7E6037399F0D770BAF4AD</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Ziffer%20Repo</string>
+		</dict>
+	</array>
+</dict>
+</plist>
