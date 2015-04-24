@@ -1,3 +1,13 @@
+#  This will record the deviation between 0s and 1s (a monobit test)
+#  for each SAMPLE_SIZE number of bits and record it in a deviations.csv file
+#  I've been using it to run extended tests on a Raspberry Pi under my couch
+#
+#  To run this in the background from ssh, use the following:
+#
+#  nohup python monobit_samples_over_time.py &
+#
+#  Rob Seward 2015
+
 import serial
 import time
 import sys
@@ -7,8 +17,11 @@ import datetime
 
 use_curses = 0
 
+#OSX usb ports
 ser = serial.Serial('/dev/tty.usbmodem1411', 230400)
 #ser = serial.Serial('/dev/tty.usbmodemfd121', 230400)
+#raspberry pi:
+#ser = serial.Serial('/dev/ttyACM0', 230400)            
 
 SAMPLE_SIZE = 10000000
 
