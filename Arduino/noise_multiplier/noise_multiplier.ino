@@ -7,7 +7,7 @@ AES128 aes128;
 byte key[32] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                     0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
 
-
+int state = COLLECTING;
  
 void setup()
 {
@@ -37,7 +37,8 @@ void setup()
 
   sei();
 
-  Serial.begin(230400);
+  Serial.begin(9600);
+  Serial.println("Starting...");
 
   //Set D pins to input
   DDRD = 0x00;
@@ -45,16 +46,23 @@ void setup()
   aes128.setKey(key, aes128.keySize());
 } 
 
-byte currentByte = 0x00;
-int bitCounter = 0;
-bool flip = false;
+
 ISR(TIMER1_COMPA_vect) { 
-  byte pinInput = 0;
-  pinInput = PIND >> 7;
-  currentByte |= pinInput << bitCounter;
+  if (state == COLLECTING){
+    byte pinVal = 0;
+    pinVal = PIND >> 7;
+    collectBit(pinVal);
+  }
+}
+
+
+void collectBit(byte inputBit){
+  static byte currentByte = 0x00;
+  static int bitCounter = 0;
+  currentByte |= inputBit << bitCounter;
 
   if (bitCounter == 7) {
-    //Serial.write(currentByte);
+    Serial.println(currentByte);
     currentByte = 0;
   }
 
