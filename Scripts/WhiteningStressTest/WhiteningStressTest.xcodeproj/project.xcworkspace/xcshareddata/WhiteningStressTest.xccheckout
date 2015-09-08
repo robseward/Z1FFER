@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>6A755ADE-7909-44CB-B7E0-644A3DFA4CCD</string>
 	<key>IDESourceControlProjectName</key>
-	<string>WhiteningStressTest</string>
+	<string>project</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>387290974BC2B49F5AF7E6037399F0D770BAF4AD</key>
 		<string>https://github.com/robseward/Ziffer.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Scripts/WhiteningStressTest/WhiteningStressTest.xcodeproj</string>
+	<string>Scripts/WhiteningStressTest/WhiteningStressTest.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>387290974BC2B49F5AF7E6037399F0D770BAF4AD</key>

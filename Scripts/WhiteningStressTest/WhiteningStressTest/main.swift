@@ -10,7 +10,7 @@ import Foundation
 
 
 
-let SampleLength: UInt = 100000
+let SampleLength: UInt = 400000
 
 
 
@@ -88,26 +88,37 @@ func whiten(inout randomArray : [UInt8]){
 func saveToFile(filename : String, inout randomArray : [UInt8]){
     let dirs : [String]? = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DesktopDirectory, NSSearchPathDomainMask.AllDomainsMask, true) as? [String]
     if ((dirs) != nil) {
-        let dir = dirs![0]; //documents directory
+        let dir = dirs![0]; //desktop directory
         let path = dir.stringByAppendingPathComponent(filename);
         let data = NSData(bytes: &randomArray, length: randomArray.count)
+        println(path)
         data.writeToFile(path, atomically: true);
     }
 }
 
 func main() {
     
-    for var deviation:Float = -0.1; deviation < -0.04; deviation += 0.01{
-        var randomArray = [UInt8]()
-        initializeRandomArray(&randomArray)
-        adjustDeviation(&randomArray, deviation)
-        whiten(&randomArray)
-        let whitenedDeviation = calculateDeviation(&randomArray)
-        println("\nDeviation: \(deviation) Whitened = \(whitenedDeviation)")
-        let filename = "random_test_\(deviation).dat"
-        saveToFile(filename, &randomArray)
+    var randomArray = [UInt8]()
+    initializeRandomArray(&randomArray)
+    let filename = "random_baseline.dat"
+    saveToFile(filename, &randomArray)
+    let queue = NSOperationQueue()
+    for var deviation:Float = -0.1; deviation < 0.1; deviation += 0.01{
+        let staticDeviation = deviation
+        queue.addOperationWithBlock({ () -> Void in
+            var randomArray = [UInt8]()
+            initializeRandomArray(&randomArray)
+            adjustDeviation(&randomArray, staticDeviation)
+            whiten(&randomArray)
+            let whitenedDeviation = calculateDeviation(&randomArray)
+            println("\nDeviation: \(staticDeviation) Whitened = \(whitenedDeviation)")
+            let filename = "random_test_\(staticDeviation).dat"
+            saveToFile(filename, &randomArray)
+        })
     }
-    
+
+    queue.waitUntilAllOperationsAreFinished()
+
 }
 
 
