@@ -14,11 +14,13 @@ import sys
 import curses
 import atexit
 import datetime
+import math
 
 use_curses = 0
 
 #OSX usb ports
-ser = serial.Serial('/dev/tty.usbmodem1411', 230400)
+ser = 0
+# ser = serial.Serial('/dev/tty.usbmodem1411', 230400)
 #ser = serial.Serial('/dev/tty.usbmodemfd121', 230400)
 #raspberry pi:
 #ser = serial.Serial('/dev/ttyACM0', 230400)            
@@ -32,7 +34,8 @@ def exit_handler():
     ser.close()
     print 'Deviation Sample Test Exiting'
 
-def get_data_from_rng():
+
+def get_data_from_rng(filename_suffix):
     if use_curses:
         screen.addstr(0, 0, "Burning initial bits...")
         screen.refresh()
@@ -46,10 +49,11 @@ def get_data_from_rng():
         bytes_burnt += read_count
 
     if use_curses: screen.addstr(0, 0, "Initial bits burnt...")
-   
+
     start_time = time.time()
 
-    filename = "deviations.csv"
+    time_unix_seconds = math.floor(time.time())
+    filename = "log_{0}_{1}.csv".format(filename_suffix, time_unix_seconds)
     f = open(filename, 'w')
 
     if not use_curses: print("starting...")
@@ -67,10 +71,10 @@ def get_data_from_rng():
                 ones += one_count
                 zeros += 8 - one_count
         deviation = float(ones - zeros) / float(ones + zeros)
-    
+
         time_string = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         f = open(filename, 'a')
-        f.write ("{0}, {1:1.5f}\n".format(time_string, deviation)) 
+        f.write("{0}, {1:1.5f}\n".format(time_string, deviation))
         f.close()
 
     f.close()
@@ -109,9 +113,9 @@ def reset_arduino():
     ser.setDTR(1)
 
 
-def take_sample():
+def take_sample(filename_suffix):
     with Timer() as t:
-        get_data_from_rng()
+        get_data_from_rng(filename_suffix)
 
 
 class Timer:
@@ -127,6 +131,9 @@ class Timer:
 if __name__ == '__main__':
     atexit.register(exit_handler)
 
+    portname = sys.argv[1]
+    ser = serial.Serial('/dev/' + portname, 230400)
+
     ser.timeout = 10.0
 
     reset_arduino()
@@ -137,9 +144,8 @@ if __name__ == '__main__':
         curses.cbreak()
         screen.refresh()
 
-    take_sample()
+    take_sample(portname)
 
     if use_curses:
         curses.endwin()
     ser.close()
-
