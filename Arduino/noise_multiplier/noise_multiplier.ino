@@ -1,13 +1,14 @@
 #include "AES.h"
 
-#define COLLECTING 0
-#define CONDITIONING 1
+#define CHAIN_SIZE 2
+#define BLOCK_SIZE 16
+#define SAMPLE_SIZE BLOCK_SIZE * CHAIN_SIZE
 
 AES128 aes128;
-byte key[32] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+byte key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                     0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
 
-int state = COLLECTING;
+byte sourcePool[SAMPLE_SIZE];
  
 void setup()
 {
@@ -47,31 +48,46 @@ void setup()
 } 
 
 
-ISR(TIMER1_COMPA_vect) { 
-  if (state == COLLECTING){
-    byte pinVal = 0;
-    pinVal = PIND >> 7;
-    collectBit(pinVal);
-  }
-}
-
-
-void collectBit(byte inputBit){
-  static byte currentByte = 0x00;
-  static int bitCounter = 0;
-  currentByte |= inputBit << bitCounter;
-
-  if (bitCounter == 7) {
+ISR(TIMER1_COMPA_vect) {
+  static byte currentByte = 0x00; 
+  byte pinVal = PIND >> 7;
+  boolean byteReady = collectBit(pinVal, &currentByte);
+ 
+  if (byteReady){
     Serial.println(currentByte);
+    boolean poolFull = collectByte(currentByte);
+    if (poolFull){
+      conditionPool();
+      //TODO: transmit MAC
+    }
     currentByte = 0;
   }
-
-  bitCounter = ++bitCounter % 8;
 }
 
-void processByte(byte currentByte){
 
+boolean collectBit(byte inputBit, byte *currentByte){
+  static int bitCounter = 0;
+  *currentByte |= inputBit << bitCounter;
+   bitCounter = ++bitCounter % 8;
+  
+  if (bitCounter == 0) {
+    return true;
+  }
+  return false;
+}
 
+boolean collectByte(byte currentByte){
+  static int byteCount = 0;
+  sourcePool[byteCount] = currentByte;
+  byteCount = ++byteCount % SAMPLE_SIZE;
+  if (byteCount == 0){
+    return true;
+  }
+  return false;
+}
+
+void conditionPool(){
+  
 }
 
 void loop()
