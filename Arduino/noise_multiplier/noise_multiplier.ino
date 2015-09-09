@@ -1,12 +1,15 @@
 #include "AES.h"
+#include "CBC.h"
 
 #define CHAIN_SIZE 2
 #define BLOCK_SIZE 16
-#define SAMPLE_SIZE BLOCK_SIZE * CHAIN_SIZE
+#define SAMPLE_SIZE (BLOCK_SIZE * CHAIN_SIZE)
 
-AES128 aes128;
 byte key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
                     0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F};
+
+CBC<AES128> cbc;
+
 
 byte sourcePool[SAMPLE_SIZE];
  
@@ -38,13 +41,12 @@ void setup()
 
   sei();
 
-  Serial.begin(9600);
+  Serial.begin(230400);
   Serial.println("Starting...");
 
   //Set D pins to input
   DDRD = 0x00;
   
-  aes128.setKey(key, aes128.keySize());
 } 
 
 
@@ -54,7 +56,7 @@ ISR(TIMER1_COMPA_vect) {
   boolean byteReady = collectBit(pinVal, &currentByte);
  
   if (byteReady){
-    Serial.println(currentByte);
+    //Serial.println("ByteCollected");
     boolean poolFull = collectByte(currentByte);
     if (poolFull){
       conditionPool();
@@ -80,14 +82,26 @@ boolean collectByte(byte currentByte){
   static int byteCount = 0;
   sourcePool[byteCount] = currentByte;
   byteCount = ++byteCount % SAMPLE_SIZE;
+  //Serial.println(byteCount);
+
   if (byteCount == 0){
     return true;
   }
   return false;
 }
-
+ 
 void conditionPool(){
+  //Serial.println("Conditioning");
+  static byte iv[BLOCK_SIZE] = {0};
+  byte output[SAMPLE_SIZE];
+  cbc.clear();
+  cbc.setKey(key, 16);
+  cbc.setIV(iv, 16);
+  cbc.encrypt(output, sourcePool, SAMPLE_SIZE);
   
+   //advance pointer to last block (the MAC)
+  byte *outBuf = &output[SAMPLE_SIZE - BLOCK_SIZE]; 
+  Serial.write(outBuf, BLOCK_SIZE);
 }
 
 void loop()
