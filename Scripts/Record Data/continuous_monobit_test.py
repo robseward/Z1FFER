@@ -6,7 +6,7 @@ import atexit
 
 use_curses = 1
 
-ser = serial.Serial('/dev/tty.usbmodem1411', 230400)
+ser = serial.Serial('/dev/tty.usbmodem1411', 115200)
 #ser = serial.Serial('/dev/tty.usbmodemfd121', 230400)
 
 # SAMPLE_SIZE = 104857600
