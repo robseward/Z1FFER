@@ -1,3 +1,14 @@
+/* 
+ *  Z1FFER
+ *  OpenRandom.org
+ *  
+ *  2015 Rob Seward
+ *  
+ *  Captures random data from Z1FFER v0.2.0 and conditions it using AES-CBC-MAC
+ *  
+ *  Requires Rhys Weatherley's crypto library: https://github.com/rweather/arduinolibs
+ */
+
 #include "AES.h"
 #include "CBC.h"
 
