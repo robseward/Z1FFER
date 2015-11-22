@@ -19,7 +19,19 @@ void setup()
   // Setting DDB1 and DDB2
   DDRB |= bit (DDB1) | bit (DDB2);
 
-  // stop timer 1
+  setupClockSignals();
+
+  enableInterrupts();
+
+  Serial.begin(230400);
+  Serial.println("Starting...");
+
+  //Set D pins to input
+  DDRD = 0x00;
+} 
+
+void setupClockSignals() {
+    // stop timer 1
   TCCR1A = 0;
   TCCR1B = 0;
 
@@ -35,20 +47,13 @@ void setup()
   ICR1 = 15;
   OCR1B = 7;
   OCR1A = 7;
+}
 
-  // enable timer compare interrupt
+void enableInterrupts(){
+    // enable timer compare interrupt
   TIMSK1 |= (1 << OCIE1A);
-
   sei();
-
-  Serial.begin(230400);
-  Serial.println("Starting...");
-
-  //Set D pins to input
-  DDRD = 0x00;
-  
-} 
-
+}
 
 ISR(TIMER1_COMPA_vect) {
   static byte currentByte = 0x00; 
