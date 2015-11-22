@@ -15,6 +15,10 @@ byte sourcePool[SAMPLE_SIZE];
  
 void setup()
 {
+  
+  //TODO: move interrupt configuration into its own function
+  //Maybe call it configureClockSignals()
+  
   // Defining PB1 and PB2 as outputs by setting PORTB1 and PORTB2
   // Setting DDB1 and DDB2
   DDRB |= bit (DDB1) | bit (DDB2);
@@ -84,6 +88,7 @@ boolean collectBit(byte inputBit, byte *currentByte){
   return false;
 }
 
+//@return true if sourcePool is full
 boolean collectByte(byte currentByte){
   static int byteCount = 0;
   sourcePool[byteCount] = currentByte;
@@ -96,6 +101,8 @@ boolean collectByte(byte currentByte){
   return false;
 }
  
+ //TODO: this should return encrypted pool, and mac should
+ //be sent in the calling function
 void conditionPool(){
   //Serial.println("Conditioning");
   static byte iv[BLOCK_SIZE] = {0};
