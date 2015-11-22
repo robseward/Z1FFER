@@ -10,8 +10,10 @@ byte key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 
 CBC<AES128> cbc;
 
-
 byte sourcePool[SAMPLE_SIZE];
+byte moduloReplacement;
+ 
+/******* SETUP *********/
  
 void setup()
 {
@@ -23,15 +25,15 @@ void setup()
   // Setting DDB1 and DDB2
   DDRB |= bit (DDB1) | bit (DDB2);
 
-  setupClockSignals();
-
-  enableInterrupts();
-
-  Serial.begin(230400);
-  Serial.println("Starting...");
-
   //Set D pins to input
   DDRD = 0x00;
+
+  Serial.begin(230400);
+  //Serial.println("Starting...");
+  
+  calculateModuloReplacement();
+  setupClockSignals();
+  enableInterrupts();
 } 
 
 void setupClockSignals() {
@@ -59,6 +61,24 @@ void enableInterrupts(){
   sei();
 }
 
+//This method is so we don't have to use modulo in collectBytes().
+//(Modulo is very slow on Arduino.)
+void calculateModuloReplacement(){
+  double logValue = log(SAMPLE_SIZE) / log(2);
+  double roundedLogValue = round(logValue);
+  
+  //Assert that sample size is a power of 2
+  //Otherwise our fast modulo technique will not work
+  if (fabs(logValue - roundedLogValue) > 0.001) {
+    abort();
+  }
+  
+  int variableSizeInBits = sizeof(moduloReplacement) * 8;
+  moduloReplacement = 0xFF >> (variableSizeInBits - (byte)roundedLogValue);
+}
+
+/******** Interrupt Callback and helpers ********/
+
 ISR(TIMER1_COMPA_vect) {
   static byte currentByte = 0x00; 
   byte pinVal = PIND >> 7;
@@ -68,8 +88,8 @@ ISR(TIMER1_COMPA_vect) {
     //Serial.println("ByteCollected");
     boolean poolFull = collectByte(currentByte);
     if (poolFull){
-      conditionPool();
-      //TODO: transmit MAC
+      //conditionPool();
+      Serial.write(sourcePool, SAMPLE_SIZE);
     }
     currentByte = 0;
   }
@@ -92,7 +112,7 @@ boolean collectBit(byte inputBit, byte *currentByte){
 boolean collectByte(byte currentByte){
   static int byteCount = 0;
   sourcePool[byteCount] = currentByte;
-  byteCount = ++byteCount % SAMPLE_SIZE;
+  byteCount = (++byteCount) & moduloReplacement;
   //Serial.println(byteCount);
 
   if (byteCount == 0){
