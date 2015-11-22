@@ -71,11 +71,12 @@ ISR(TIMER1_COMPA_vect) {
   }
 }
 
-
+//@return true if byte is full/complete
 boolean collectBit(byte inputBit, byte *currentByte){
   static int bitCounter = 0;
   *currentByte |= inputBit << bitCounter;
-   bitCounter = ++bitCounter % 8;
+  //modulo is very slow, so we do a bitwise operation. Equivelant to % 8
+   bitCounter = (++bitCounter) & 0b00000111; 
   
   if (bitCounter == 0) {
     return true;
