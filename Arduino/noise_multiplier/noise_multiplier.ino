@@ -32,9 +32,9 @@ void setup()
            | bit (CS11);                  // Start timer, prescaler of 8
 
   // Initialize OCR1A = 300 (pulse_width = 150us), OCR1B, and ICR1
-  ICR1 = 45;
-  OCR1B = 22;
-  OCR1A = 22;
+  ICR1 = 15;
+  OCR1B = 7;
+  OCR1A = 7;
 
   // enable timer compare interrupt
   TIMSK1 |= (1 << OCIE1A);
