@@ -4,9 +4,9 @@
  *  
  *  2015 Rob Seward
  *  
- *  Captures random data from Z1FFER v0.2.0 and conditions it using AES-CBC-MAC
- *  
- *  Requires Rhys Weatherley's crypto library: https://github.com/rweather/arduinolibs
+ *  Sends raw random data to the host as fast as possible. 
+ *  Baud rate is 230400 
+ * 
  */
  
 void setup()
@@ -16,7 +16,6 @@ void setup()
   DDRB = B00000000;
   delay(1000);
 } 
-
 
 void loop() {
   static byte currentByte = 0x00; 
