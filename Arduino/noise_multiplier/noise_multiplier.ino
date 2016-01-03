@@ -2,7 +2,7 @@
 #include "CBC.h"
 
 #define CHAIN_SIZE 2
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 16  // this is defined in AES library. We should probably set it dynamically.
 #define SAMPLE_SIZE (BLOCK_SIZE * CHAIN_SIZE)
 
 byte key[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
