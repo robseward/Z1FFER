@@ -6,14 +6,14 @@ import atexit
 
 use_curses = 1
 
-ser = serial.Serial('/dev/tty.usbmodem1411', 115200)
+ser = serial.Serial('/dev/tty.usbmodem1411', 2000000)
 #ser = serial.Serial('/dev/tty.usbmodemfd121', 230400)
 
 # SAMPLE_SIZE = 104857600
 # SAMPLE_SIZE = 314572800
 # SAMPLE_SIZE = 125000000
 # SAMPLE_SIZE = 39321600
-SAMPLE_SIZE = 10000000
+SAMPLE_SIZE = 100000
 
 
 
@@ -28,7 +28,7 @@ def get_data_from_rng():
     screen.refresh()
 
     #burn some bytes (I think there may be some kind of serial buffer weirdness going on
-    bytes_to_burn = 1000
+    bytes_to_burn = 300
     bytes_burnt = 0
     while bytes_burnt < bytes_to_burn:
         ser.read(1)
@@ -123,4 +123,3 @@ if __name__ == '__main__':
     if use_curses:
         curses.endwin()
     ser.close()
-
