@@ -29,7 +29,6 @@ void setup()
   DDRD = 0x00;
 
   Serial.begin(2000000);
-  //Serial.println("Starting...");
   
   calculateModuloReplacement();
   setupClockSignals();
@@ -84,15 +83,12 @@ void calculateModuloReplacement(){
 
 ISR(TIMER1_COMPA_vect) {
   static byte currentByte = 0x00; 
-  byte pinVal = PIND >> 7;
-  boolean byteReady = collectBit(pinVal, &currentByte);
- 
-  PORTD = 0b00000100;
-  delayMicroseconds(1);
-  PORTD = 0b00000000;
+    byte pinVals = (PIND >> 6) & 0b00000011;
+  boolean byteReady = collectBits(pinVals, &currentByte);
+
  
   if (byteReady){
-    Serial.write(currentByte);
+//    Serial.write(currentByte);
     boolean poolFull = collectByte(currentByte);
     if (poolFull){
       conditionPoolAndWriteToSerial();
@@ -103,11 +99,13 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 //@return true if byte is full/complete
-boolean collectBit(byte inputBit, byte *currentByte){
+boolean collectBits(byte inputBits, byte *currentByte){
   static int bitCounter = 0;
-  *currentByte |= inputBit << bitCounter;
+  *currentByte |= inputBits << bitCounter;
+  bitCounter += 2;
+
   //modulo is very slow, so we do a bitwise operation. Equivelant to % 8
-   bitCounter = (++bitCounter) & 0b00000111; 
+  bitCounter = bitCounter & 0b00000111; 
   
   if (bitCounter == 0) {
     return true;
@@ -120,7 +118,6 @@ boolean collectByte(byte currentByte){
   static int byteCount = 0;
   sourcePool[byteCount] = currentByte;
   byteCount = (++byteCount) & moduloReplacement;
-  //Serial.println(byteCount);
 
   if (byteCount == 0){
     return true;
