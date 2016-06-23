@@ -11,7 +11,8 @@
  
 void setup()
 {
-  Serial.begin(230400);
+  Serial.begin(2000000);
+//  Serial.begin(230400);
   //Set B pins to input
   DDRB = B00000000;
   delay(1000);
