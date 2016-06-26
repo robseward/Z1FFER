@@ -1,85 +1,37 @@
 
-byte moduloReplacement;
+bool flip = false;
  
-/******* SETUP *********/
- 
-void setup()
-{
-  // Defining PB1 and PB2 as outputs by setting PORTB1 and PORTB2
-  // Setting DDB1 and DDB2
-  DDRB |= bit (DDB1) | bit (DDB2);
-
+void setup() {
+  //Set B pins to output
+  DDRB = 0b11111111;
   //Set D pins to input
   DDRD = 0x00;
-
+  
   Serial.begin(2000000);
-  //Serial.println("Starting...");
-  
-  setupClockSignals();
-  enableInterrupts();
-} 
-
-void setupClockSignals() {
-    // stop timer 1
-  TCCR1A = 0;
-  TCCR1B = 0;
-
-  TCCR1A = bit (COM1B0) | bit (COM1B1)  // Set OC1B on Compare Match, clear
-           // OC1B at BOTTOM (inverting mode)
-           | bit (COM1A1)                 // Clear OC1A on Compare Match, set
-           // OC1A at BOTTOM (non-inverting mode)
-           | bit (WGM11) | bit (WGM13);                 // Fast PWM, top at ICR1
-  TCCR1B = bit (WGM12)  | bit (WGM13)   //       ditto
-           | bit (CS11);                  // Start timer, prescaler of 8
-
-  // Initialize OCR1A = 300 (pulse_width = 150us), OCR1B, and ICR1
-  ICR1 = 15;
-  OCR1B = 7;
-  OCR1A = 7;
-
-//   ICR1 = 45;
-//  OCR1B = 22;
-//  OCR1A = 22;
 }
 
-void enableInterrupts(){
-    // enable timer compare interrupt
-  TIMSK1 |= (1 << OCIE1A);
-  sei();
-}
+int currentByte = 0;
+int i=0;
 
-/******** Interrupt Callback and helpers ********/
-
-ISR(TIMER1_COMPA_vect) {
-  static byte currentByte = 0x00; 
-  byte pinVals = (PIND >> 6) & 0b00000011;
-  boolean byteReady = collectBits(pinVals, &currentByte);
- 
-//  PORTD = 0b00000100;
-//  delayMicroseconds(1);
-//  PORTD = 0b00000000;
- 
-  if (byteReady){
-    Serial.write(currentByte);
-    currentByte = 0;
+void loop() {
+  currentByte = 0;
+  for (i=0; i < 8; i += 2) {
+    runClockSignals();
+    runClockSignals();
+    byte pinVal = (PIND >> 6) & B00000011;
+    currentByte |= pinVal << i;
   }
+  Serial.write(currentByte);
 }
 
-//@return true if byte is full/complete
-boolean collectBits(byte inputBits, byte *currentByte){
-  static int bitCounter = 0;
-  *currentByte |= inputBits << bitCounter;
-  bitCounter += 2;
-
-  //modulo is very slow, so we do a bitwise operation. Equivelant to % 8
-  bitCounter = bitCounter & 0b00000111; 
-  
-  if (bitCounter == 0) {
-    return true;
+void runClockSignals(){
+  if (flip) {
+    PORTB = 0b00000010;
   }
-  return false;
+  else {
+    PORTB = 0b00000100;
+  }
+  flip = !flip;
 }
 
-void loop()
-{
-}
+
