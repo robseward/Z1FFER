@@ -51,7 +51,7 @@ void takeSample()
   mixedByte4 = mixedByte3 ^ previousMixedByte3;
   outByte = mixedByte4 ^ previousMixedByte4;
   //Send it to your computer
-  Serial.write(outByte);  
+  Serial.write(currentByte);  
   
   previousByte = currentByte;
   previousMixedByte1 = mixedByte1;

@@ -28,7 +28,7 @@ void setup()
   //Set D pins to input
   DDRD = 0x00;
 
-  Serial.begin(230400);
+  Serial.begin(2000000);
   //Serial.println("Starting...");
   
   calculateModuloReplacement();
@@ -53,6 +53,9 @@ void setupClockSignals() {
   ICR1 = 15;
   OCR1B = 7;
   OCR1A = 7;
+//   ICR1 = 45;
+//  OCR1B = 22;
+//  OCR1A = 22;
 }
 
 void enableInterrupts(){
@@ -84,12 +87,16 @@ ISR(TIMER1_COMPA_vect) {
   byte pinVal = PIND >> 7;
   boolean byteReady = collectBit(pinVal, &currentByte);
  
+  PORTD = 0b00000100;
+  delayMicroseconds(1);
+  PORTD = 0b00000000;
+ 
   if (byteReady){
-    //Serial.println("ByteCollected");
+    Serial.write(currentByte);
     boolean poolFull = collectByte(currentByte);
     if (poolFull){
-      //conditionPool();
-      Serial.write(sourcePool, SAMPLE_SIZE);
+      conditionPool();
+//      Serial.write(sourcePool, SAMPLE_SIZE);
     }
     currentByte = 0;
   }
