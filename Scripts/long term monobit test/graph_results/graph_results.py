@@ -6,7 +6,7 @@ import datetime
 from numpy import polyfit
 import numpy as np
 
-f = open("20150315_deviations.csv")
+f = open("deviations.csv")
 
 values = []
 timestamps = []
