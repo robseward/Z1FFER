@@ -11,6 +11,7 @@ def choose_port(portNumber = None):
         count = 1
         for port in ports:
             optionsQueryString += "{0}: {1}\n".format(count, port)
+            count += 1
         portNumber = raw_input(optionsQueryString)
     try:
         choice = int(portNumber) - 1

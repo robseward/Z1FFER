@@ -3,10 +3,15 @@ import time
 import sys
 import curses
 import atexit
+import imp
+
+portLister = imp.load_source('portLister', '../Shared/portLister.py')
 
 use_curses = 1
 
-ser = serial.Serial('/dev/tty.usbmodem1411', 2000000)
+BAUD_RATE = 2000000
+ser = None
+#ser = serial.Serial('/dev/tty.usbmodem1411', 2000000)
 #ser = serial.Serial('/dev/tty.usbmodemfd121', 230400)
 
 # SAMPLE_SIZE = 104857600
@@ -20,7 +25,8 @@ SAMPLE_SIZE = 100000
 def exit_handler():
     if use_curses:
         curses.endwin()
-    ser.close()
+    if ser != None:
+        ser.close()
     print 'Monobit test Exiting'
 
 def get_data_from_rng():
@@ -106,17 +112,19 @@ class Timer:
 
 
 if __name__ == '__main__':
+    portName = portLister.choose_port()
+    ser = serial.Serial(portName, BAUD_RATE)
+    
     atexit.register(exit_handler)
-
-    ser.timeout = 10.0
-
-    reset_arduino()
 
     if use_curses:
         screen = curses.initscr()
         curses.noecho()
         curses.cbreak()
         screen.refresh()
+
+    ser.timeout = 10.0
+    reset_arduino()
 
     take_sample()
 
