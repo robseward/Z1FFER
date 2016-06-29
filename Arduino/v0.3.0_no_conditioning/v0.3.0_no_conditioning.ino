@@ -1,12 +1,19 @@
 
-/*  Z1FFER 
- *  Created by Rob Seward 2015
+/**
+ * Z1FFER v0.3.X Firmware.
+ *
+ * This code is designed to be as fast as possible.
+ * It operates two inverted clock signals on pins 9 and 10
+ * while reading in random bytes on pins 6 and 7.
+ * Pins are read and written to using the registers for speed.
+ * The clock signal is irregular but this does not effect the
+ * performance of the Z1FFER shield. 
  */
 
 bool flip = false;
 int currentByte = 0;
 int i=0;
- 
+
 void setup() {
   //Set B pins to output
   DDRB = 0b11111111;
@@ -43,5 +50,3 @@ void runClockSignals(){
   }
   flip = !flip;
 }
-
-
