@@ -14,11 +14,11 @@ ser = None
 #ser = serial.Serial('/dev/tty.usbmodem1411', 2000000)
 #ser = serial.Serial('/dev/tty.usbmodemfd121', 230400)
 
-# SAMPLE_SIZE = 104857600
-# SAMPLE_SIZE = 314572800
-# SAMPLE_SIZE = 125000000
-# SAMPLE_SIZE = 39321600
-SAMPLE_SIZE = 100000
+# sample_size = 104857600
+# sample_size = 314572800
+# sample_size = 125000000
+# sample_size = 39321600
+sample_size = 100000
 
 
 
@@ -45,7 +45,7 @@ def get_data_from_rng():
     bytes_list = []
     ones = 0
     zeros = 0
-    while len(bytes_list) < SAMPLE_SIZE:
+    while len(bytes_list) < sample_size:
         if len(bytes_list) % 100 == 0:
             report_progress(ones, zeros, bytes_list, start_time)
         #if ser.inWaiting() > 0:
@@ -81,11 +81,11 @@ def report_progress(ones, zeros, bytes_list, start_time):
         screen.addstr(2, 0, "Difference: {0}    ".format(ones - zeros))
         screen.addstr(3, 0, "Deviation: {0:2.10f}    ".format(deviation))
         screen.addstr(4, 0, "Elapsed Time: {0:2.2f}".format(time.time() - start_time))
-        screen.addstr(5, 0, "Percent Complete: {0:2.2f}".format((float(total_bytes) / float(SAMPLE_SIZE)) * 100))
+        screen.addstr(5, 0, "Percent Complete: {0:2.2f}".format((float(total_bytes) / float(sample_size)) * 100))
         screen.addstr(6, 0, "kb/s: {0:2.2f}".format(kbs))
         screen.refresh()
     else:
-        progress = (len(bytes_list) / float(SAMPLE_SIZE)) * 100.0
+        progress = (len(bytes_list) / float(sample_size)) * 100.0
         progress_str = "{0:2.2f}%\r".format(progress)
         sys.stdout.write(progress_str)
 
@@ -110,11 +110,23 @@ class Timer:
         self.end = time.clock()
         self.interval = self.end - self.start
 
+def user_input_bytes():
+    queryString = "Enter the number of bytes to record:\n"
+    errorMessage = "Not a valid number.\n"
+
+    userInput = raw_input(queryString)
+    try:
+        numBytes = int(userInput)
+    except ValueError:
+        print(errorMessage)
+        return input_bytes()
+    return numBytes
 
 if __name__ == '__main__':
     portName = portLister.choose_port()
     ser = serial.Serial(portName, BAUD_RATE)
-    
+    sample_size = user_input_bytes()
+
     atexit.register(exit_handler)
 
     if use_curses:
