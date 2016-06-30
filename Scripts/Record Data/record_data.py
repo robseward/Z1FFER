@@ -11,16 +11,8 @@ use_curses = 1
 
 BAUD_RATE = 2000000
 ser = None
-#ser = serial.Serial('/dev/tty.usbmodem1411', 2000000)
-#ser = serial.Serial('/dev/tty.usbmodemfd121', 230400)
 
-# sample_size = 104857600
-# sample_size = 314572800
-# sample_size = 125000000
-# sample_size = 39321600
 sample_size = 100000
-
-
 
 def exit_handler():
     if use_curses:
@@ -143,3 +135,4 @@ if __name__ == '__main__':
     if use_curses:
         curses.endwin()
     ser.close()
+    print "{0} bytes written to random.dat".format(sample_size)
