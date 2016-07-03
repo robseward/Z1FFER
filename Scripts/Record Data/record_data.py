@@ -35,12 +35,12 @@ def get_data_from_rng():
 
     start_time = time.time()
     f = open("random.dat", 'w')
-    bytes_list = []
+    byte_count = 0
     ones = 0
     zeros = 0
-    while len(bytes_list) < sample_size:
-        if len(bytes_list) % 1000 == 0 and len(bytes_list) > 0:
-            report_progress(ones, zeros, bytes_list, start_time)
+    while byte_count < sample_size:
+        if byte_count % 100 == 0 and byte_count > 0:
+            report_progress(ones, zeros, byte_count, start_time)
         #if ser.inWaiting() > 0:
         byte_string = ser.read(1)
         f.write(byte_string)
@@ -51,7 +51,7 @@ def get_data_from_rng():
             one_count = bin(b).count("1")
             ones += one_count
             zeros += 8 - one_count
-        bytes_list.append(byte_string)
+            byte_count += 1
 
     f.close()
     if not use_curses:
@@ -60,7 +60,7 @@ def get_data_from_rng():
         print "\n-- monobit test --\n0s: {}\n1s: {}\ndifference: {}\ntotal: {}\nDeviation: {}".format(zeros, ones, zeros - ones, zeros + ones, deviation)
 
 
-def report_progress(ones, zeros, bytes_list, start_time):
+def report_progress(ones, zeros, byte_count, start_time):
     if(ones + zeros <= 0):
         return
     deviation = float(ones - zeros) / float(ones + zeros)
@@ -69,7 +69,7 @@ def report_progress(ones, zeros, bytes_list, start_time):
     kbs = (total_bytes / elapsed_time) / 1000.0
 
     if use_curses:
-        screen.addstr(0, 0, "Total Bits: {}, Bytes: {}".format(zeros + ones, total_bytes))
+        screen.addstr(0, 0, "Total Bits: {}, Bytes: {}".format(zeros + ones, byte_count))
         screen.addstr(1, 0, "Ones: {}, Zeros: {}".format(ones, zeros))
         screen.addstr(2, 0, "Difference: {0}    ".format(ones - zeros))
         screen.addstr(3, 0, "Deviation: {0:2.10f}    ".format(deviation))
@@ -78,7 +78,7 @@ def report_progress(ones, zeros, bytes_list, start_time):
         screen.addstr(6, 0, "kb/s: {0:2.2f}".format(kbs))
         screen.refresh()
     else:
-        progress = (len(bytes_list) / float(sample_size)) * 100.0
+        progress = (byte_count / float(sample_size)) * 100.0
         progress_str = "{0:2.2f}%\r".format(progress)
         sys.stdout.write(progress_str)
 
