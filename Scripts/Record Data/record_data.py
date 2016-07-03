@@ -12,7 +12,7 @@ use_curses = 1
 BAUD_RATE = 2000000
 ser = None
 
-sample_size = 100000
+sample_size = 1000000
 
 def exit_handler():
     if use_curses:
@@ -22,8 +22,9 @@ def exit_handler():
     print 'Monobit test Exiting'
 
 def get_data_from_rng():
-    screen.addstr(0, 0, "Burning initial bits...")
-    screen.refresh()
+    if use_curses:
+        screen.addstr(0, 0, "Burning initial bits...")
+        screen.refresh()
 
     #burn some bytes (I think there may be some kind of serial buffer weirdness going on
     bytes_to_burn = 300
@@ -38,7 +39,7 @@ def get_data_from_rng():
     ones = 0
     zeros = 0
     while len(bytes_list) < sample_size:
-        if len(bytes_list) % 100 == 0:
+        if len(bytes_list) % 1000 == 0 and len(bytes_list) > 0:
             report_progress(ones, zeros, bytes_list, start_time)
         #if ser.inWaiting() > 0:
         byte_string = ser.read(1)
@@ -64,15 +65,15 @@ def report_progress(ones, zeros, bytes_list, start_time):
         return
     deviation = float(ones - zeros) / float(ones + zeros)
     elapsed_time = time.time() - start_time
-    kbs = (((zeros + ones) / 8.0) / elapsed_time) / 1000.0
+    total_bytes = float(zeros+ones) / 8.0
+    kbs = (total_bytes / elapsed_time) / 1000.0
 
-    total_bytes = (zeros+ones) / 8
     if use_curses:
         screen.addstr(0, 0, "Total Bits: {}, Bytes: {}".format(zeros + ones, total_bytes))
         screen.addstr(1, 0, "Ones: {}, Zeros: {}".format(ones, zeros))
         screen.addstr(2, 0, "Difference: {0}    ".format(ones - zeros))
         screen.addstr(3, 0, "Deviation: {0:2.10f}    ".format(deviation))
-        screen.addstr(4, 0, "Elapsed Time: {0:2.2f}".format(time.time() - start_time))
+        screen.addstr(4, 0, "Elapsed Time: {0:2.2f}".format(elapsed_time))
         screen.addstr(5, 0, "Percent Complete: {0:2.2f}".format((float(total_bytes) / float(sample_size)) * 100))
         screen.addstr(6, 0, "kb/s: {0:2.2f}".format(kbs))
         screen.refresh()
